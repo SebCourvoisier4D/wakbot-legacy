@@ -1,0 +1,18 @@
+{
+	"mavenCmd": "java -classpath /usr/share/maven/boot/plexus-classworlds-2.4.jar -Dmaven.home=/usr/share/maven -Dclassworlds.conf=/usr/share/maven/bin/m2.conf org.codehaus.plexus.classworlds.launcher.Launcher -f pom.xml -s settings.xml -Dmaven.test.failure.ignore=true test -U -B",
+	"p4BaseCmd": "/usr/local/bin/p4 -psrv-sources.private.4d.fr:1666 -u<user> -P<passwd>",
+	"reportsBasePath": "/path/to/results/",
+	"BUILD_TEMP_DIR": "/path/to/temp",
+	"BUILD_TEST_DIR": "/path/to/builds",
+	"CLI_PATH": "/path/to/some/stable/Wakanda Server/wakanda-server",
+	"P4_WORKSPACE_NAME": "<p4 workspace name>",
+	"P4_WORKSPACE_PATH": "/path/to/p4/workspace",
+	"PHANTOMJS_PATH": "/path/to/phantomjs",
+	"TEST_BRANCH": "stable",
+	"WAKANDA_BRANCH": "main",
+	"WAKANDA_URL": "127.0.0.1:8081",
+	"deepCleaning": false,
+	"noJavaTest": false,
+	"no4DTest": true,
+	"debugWAF": false
+}
