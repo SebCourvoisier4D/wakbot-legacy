@@ -3507,6 +3507,7 @@ function runTest(testName, callback, inChain) {
     clearTimeout(serverReadyRequestTimeout);
     clearTimeout(shutdownTimeout);
     clearTimeout(shellProcessKill);
+    var calledThatDamnCallbackAlready = false;
     async.series([
 
             function(mainSerieCallback) {
@@ -3519,6 +3520,7 @@ function runTest(testName, callback, inChain) {
                 getProcessListBefore(mainSerieCallback);
             },
             function(mainSerieCallback) {
+                calledThatDamnCallbackAlready = false;
                 var callbackParams = {
                     testName: testName,
                     start: new Date(),
@@ -3552,7 +3554,10 @@ function runTest(testName, callback, inChain) {
                     if (current.tryCount > 2) {
                         consoleLog('[WARN] test ' + testName + ' failed twice, skip it');
                         callbackParams.error = 'test failed twice, skip it';
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback);
                     } else {
                         try {
@@ -3614,7 +3619,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse test.conf.json file (1)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statNewArchi2 && statNewArchi2.isFile()) { // NEW ARCHI
@@ -3626,18 +3634,25 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse test.conf.json file (2)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statMaven && statMaven.isFile() && (typeof config.noJavaTest === 'undefined' || config.noJavaTest === false)) {
                         testPath = parentPath;
                         pom = fs.readFileSync(actualPath(path.join(parentPath, 'pom.xml'))).toString();
                         try {
+                            // !!!!!
                             parseString(pom, function(err, rawresult) {
                                 if (err) {
                                     consoleLog('[ERROR] cannot parse POM file (1)', err);
                                     callbackParams.error = err;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback);
                                 }
                                 pom = {};
@@ -3663,7 +3678,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse POM file (1b)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statOther && statOther.isFile()) {
@@ -3673,7 +3691,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse POM file (2)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statMaven2 && statMaven2.isFile() && (typeof config.noJavaTest === 'undefined' || config.noJavaTest === false)) {
@@ -3681,11 +3702,15 @@ function runTest(testName, callback, inChain) {
                         testPath = parentPath;
                         pom = fs.readFileSync(actualPath(path.join(parentPath, 'pom.xml'))).toString();
                         try {
+                            // !!!!!
                             parseString(pom, function(err, rawresult) {
                                 if (err) {
                                     consoleLog('[ERROR] cannot parse POM file (3)', err);
                                     callbackParams.error = err;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback);
                                 }
                                 pom = {};
@@ -3711,7 +3736,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse POM file (3b)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statOther2 && statOther2.isFile()) {
@@ -3722,13 +3750,19 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse POM file (4)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else {
                         consoleLog('[ERROR] POM not found or test disabled (1)');
                         callbackParams.error = 'POM not found or test disabled';
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback);
                     }
                 } else {
@@ -3750,7 +3784,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse test.conf.json file (3)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else if (statOther && statOther.isFile()) {
@@ -3759,7 +3796,10 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot parse POM file (5)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                         try {
@@ -3768,13 +3808,19 @@ function runTest(testName, callback, inChain) {
                         } catch (e) {
                             consoleLog('[ERROR] cannot find test file (1)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback);
                         }
                     } else {
                         consoleLog('[ERROR] POM not found (2)');
                         callbackParams.error = 'POM not found';
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback);
                     }
                 }
@@ -3809,7 +3855,10 @@ function runTest(testName, callback, inChain) {
                     if (e.code !== 'EEXIST') {
                         consoleLog('[ERROR] cannot create result folder (1)', e);
                         callbackParams.error = e;
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback, testSetup);
                     }
                 }
@@ -3819,7 +3868,10 @@ function runTest(testName, callback, inChain) {
                     if (e.code !== 'EEXIST') {
                         consoleLog('[ERROR] cannot create result folder (2)', e);
                         callbackParams.error = e;
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback, testSetup);
                     }
                 }
@@ -3829,7 +3881,10 @@ function runTest(testName, callback, inChain) {
                     if (e.code !== 'EEXIST') {
                         consoleLog('[ERROR] cannot create result folder (3)', e);
                         callbackParams.error = e;
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback, testSetup);
                     }
                 }
@@ -3839,7 +3894,10 @@ function runTest(testName, callback, inChain) {
                     if (e.code !== 'EEXIST') {
                         consoleLog('[ERROR] cannot create result folder (4)', e);
                         callbackParams.error = e;
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback, testSetup);
                     }
                 }
@@ -3853,7 +3911,10 @@ function runTest(testName, callback, inChain) {
                         if (e.code !== 'EEXIST') {
                             consoleLog('[ERROR] cannot create result folder (5)', e);
                             callbackParams.error = e;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback, testSetup);
                         } else {
                             testCount++;
@@ -3862,13 +3923,17 @@ function runTest(testName, callback, inChain) {
                 }
                 testSetup.destFullPath = actualPath(path.join(testSetup.destBasePath, testSetup.config.WAKANDA_BRANCH, testSetup.config.TEST_BRANCH, testSetup.config.CHANGELIST.toString(), testName, testCount.toString()));
                 callbackParams.resultDir = testSetup.destFullPath;
+                // !!!!!
                 temp.mkdir({
                     dir: testSetup.config.BUILD_TEMP_DIR
                 }, function(err, dirPath) {
                     if (err) {
                         consoleLog('[ERROR] cannot create workspace (1)', err);
                         callbackParams.error = err;
-                        mainSerieCallback(null);
+                        if (calledThatDamnCallbackAlready === false) {
+                            calledThatDamnCallbackAlready = true;
+                            mainSerieCallback(null);
+                        }
                         return wrapVoidTest(callbackParams, callback, testSetup);
                     }
                     callbackParams.tmpDir = dirPath;
@@ -3935,7 +4000,10 @@ function runTest(testName, callback, inChain) {
                                 if (typeof config.no4DTest !== 'undefined' && config.no4DTest === true) {
                                     consoleLog('[ERROR] 4D tests are disabled');
                                     callbackParams.error = '4D tests are disabled';
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 }
                                 // TODO: URL 4dwebtest for 4D changelist !!!!! et éviter de lancer le test lui-même si 4D ne s'est pas bien lancé
@@ -3951,7 +4019,10 @@ function runTest(testName, callback, inChain) {
                                 } catch (e) {
                                     consoleLog('[ERROR] cannot launch 4D Server (1a):', current4DServerPath, FourDBFileToOpen, e);
                                     callbackParams.error = e;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 }
                                 FourDServerProcess.stdout.on('data', function(data) {
@@ -3970,11 +4041,15 @@ function runTest(testName, callback, inChain) {
                                     }
                                     consoleLog('[STDERR] [4D] ' + data.toString());
                                 });
+                                // !!!!!
                                 FourDServerProcess.on('error', function(e) {
                                     FourDServerProcess = null;
                                     consoleLog('[ERROR] cannot launch 4D Server (1b):', current4DServerPath, FourDBFileToOpen, e);
                                     callbackParams.error = e;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 });
                                 FourDServerProcess.on('close', function(code) {
@@ -3995,7 +4070,10 @@ function runTest(testName, callback, inChain) {
                                 if (typeof config.no4DTest !== 'undefined' && config.no4DTest === true) {
                                     consoleLog('[ERROR] 4D tests are disabled');
                                     callbackParams.error = '4D tests are disabled';
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 }
                                 // TODO: URL 4dwebtest for 4D changelist !!!!! et éviter de lancer le test lui-même si 4D ne s'est pas bien lancé
@@ -4011,7 +4089,10 @@ function runTest(testName, callback, inChain) {
                                 } catch (e) {
                                     consoleLog('[ERROR] cannot launch 4D Server (1a):', current4DServerPath, FourDBFileToOpen, e);
                                     callbackParams.error = e;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 }
                                 FourDServerProcess.stdout.on('data', function(data) {
@@ -4030,11 +4111,15 @@ function runTest(testName, callback, inChain) {
                                     }
                                     consoleLog('[STDERR] [4D] ' + data.toString());
                                 });
+                                // !!!!!
                                 FourDServerProcess.on('error', function(e) {
                                     FourDServerProcess = null;
                                     consoleLog('[ERROR] cannot launch 4D Server (1b):', current4DServerPath, FourDBFileToOpen, e);
                                     callbackParams.error = e;
-                                    mainSerieCallback(null);
+                                    if (calledThatDamnCallbackAlready === false) {
+                                        calledThatDamnCallbackAlready = true;
+                                        mainSerieCallback(null);
+                                    }
                                     return wrapVoidTest(callbackParams, callback, testSetup);
                                 });
                                 FourDServerProcess.on('close', function(code) {
@@ -4125,7 +4210,10 @@ function runTest(testName, callback, inChain) {
                                         if (typeof config.no4DTest !== 'undefined' && config.no4DTest === true) {
                                             consoleLog('[ERROR] 4D tests are disabled');
                                             callbackParams.error = '4D tests are disabled';
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         }
                                         // TODO: URL 4dwebtest for 4D changelist !!!!! et éviter de lancer le test lui-même si 4D ne s'est pas bien lancé
@@ -4141,7 +4229,10 @@ function runTest(testName, callback, inChain) {
                                         } catch (e) {
                                             consoleLog('[ERROR] cannot launch 4D Server (1a):', current4DServerPath, FourDBFileToOpen, e);
                                             callbackParams.error = e;
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         }
                                         FourDServerProcess.stdout.on('data', function(data) {
@@ -4160,11 +4251,15 @@ function runTest(testName, callback, inChain) {
                                             }
                                             consoleLog('[STDERR] [4D] ' + data.toString());
                                         });
+                                        // !!!!!
                                         FourDServerProcess.on('error', function(e) {
                                             FourDServerProcess = null;
                                             consoleLog('[ERROR] cannot launch 4D Server (1b):', current4DServerPath, FourDBFileToOpen, e);
                                             callbackParams.error = e;
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         });
                                         FourDServerProcess.on('close', function(code) {
@@ -4182,7 +4277,10 @@ function runTest(testName, callback, inChain) {
                                         if (typeof config.no4DTest !== 'undefined' && config.no4DTest === true) {
                                             consoleLog('[ERROR] 4D tests are disabled');
                                             callbackParams.error = '4D tests are disabled';
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         }
                                         // TODO: URL 4dwebtest for 4D changelist !!!!! et éviter de lancer le test lui-même si 4D ne s'est pas bien lancé
@@ -4198,7 +4296,10 @@ function runTest(testName, callback, inChain) {
                                         } catch (e) {
                                             consoleLog('[ERROR] cannot launch 4D Server (1a):', current4DServerPath, FourDBFileToOpen, e);
                                             callbackParams.error = e;
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         }
                                         FourDServerProcess.stdout.on('data', function(data) {
@@ -4217,11 +4318,15 @@ function runTest(testName, callback, inChain) {
                                             }
                                             consoleLog('[STDERR] [4D] ' + data.toString());
                                         });
+                                        // !!!!!
                                         FourDServerProcess.on('error', function(e) {
                                             FourDServerProcess = null;
                                             consoleLog('[ERROR] cannot launch 4D Server (1b):', current4DServerPath, FourDBFileToOpen, e);
                                             callbackParams.error = e;
-                                            mainSerieCallback(null);
+                                            if (calledThatDamnCallbackAlready === false) {
+                                                calledThatDamnCallbackAlready = true;
+                                                mainSerieCallback(null);
+                                            }
                                             return wrapVoidTest(callbackParams, callback, testSetup);
                                         });
                                         FourDServerProcess.on('close', function(code) {
@@ -4328,12 +4433,18 @@ function runTest(testName, callback, inChain) {
                         default:
                             consoleLog('[ERROR] unknown kind of test: ' + pom.kind);
                             callbackParams.error = 'Unknown kind of test: ' + pom.kind;
-                            mainSerieCallback(null);
+                            if (calledThatDamnCallbackAlready === false) {
+                                calledThatDamnCallbackAlready = true;
+                                mainSerieCallback(null);
+                            }
                             return wrapVoidTest(callbackParams, callback, testSetup);
                             break;
                     }
                 });
-                mainSerieCallback(null);
+                if (calledThatDamnCallbackAlready === false) {
+                    calledThatDamnCallbackAlready = true;
+                    mainSerieCallback(null);
+                }
             }
         ],
         function(err, results) {
